@@ -4,6 +4,7 @@ import (
 	"dimerryy/snippetbox/pkg/models"
 	"path/filepath"
 	"text/template"
+	"time"
 )
 
 // Define a templateData type to act as the holding structure for
@@ -11,8 +12,17 @@ import (
 // At the moment it only contains one field, but we'll add more
 // to it as the build progresses.
 type templateData struct {
-	Snippet  *models.Snippet
-	Snippets []*models.Snippet
+	CurrentYear int
+	Snippet     *models.Snippet
+	Snippets    []*models.Snippet
+}
+
+func humanDate(t time.Time) string {
+	return t.Format("02 Jan 2025 at 15:05")
+}
+
+var functions = template.FuncMap{
+	"humanDate": humanDate,
 }
 
 func newTemplateCache(dir string) (map[string]*template.Template, error) {
@@ -31,7 +41,7 @@ func newTemplateCache(dir string) (map[string]*template.Template, error) {
 		// and assign it to the name variable.
 		name := filepath.Base(page)
 		// Parse the page template file in to a template set.
-		ts, err := template.ParseFiles(page)
+		ts, err := template.New(name).Funcs(functions).ParseFiles(page)
 		if err != nil {
 			return nil, err
 		}
