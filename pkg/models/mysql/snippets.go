@@ -9,7 +9,7 @@ type SnippetModel struct {
 	DB *sql.DB
 }
 
-func (m *SnippetModel) Insert(title, content, created, expires string) (int, error) {
+func (m *SnippetModel) Insert(title, content, expires string) (int, error) {
 	query := `INSERT INTO snippets (title, content, created, expires) VALUES (?, ?, UTC_TIMESTAMP(), DATE_ADD(UTC_TIMESTAMP, INTERVAL ? DAY))`
 	res, err := m.DB.Exec(query, title, content, 365)
 	if err != nil {
@@ -31,6 +31,7 @@ func (m *SnippetModel) Get(id int) (*models.Snippet, error) {
 	if err != nil {
 		return nil, err
 	}
+	s.ID = id
 	return s, nil
 }
 
